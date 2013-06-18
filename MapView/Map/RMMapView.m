@@ -2648,6 +2648,7 @@
         if (annotation.layer)
         {
             [_overlayView addSublayer:annotation.layer];
+            annotation.layer.transform = _annotationTransform;
             [_visibleAnnotations addObject:annotation];
         }
 
@@ -3123,35 +3124,36 @@
     if (newHeading.trueHeading != 0 && self.userTrackingMode == RMUserTrackingModeFollowWithHeading)
     {
         if (_userHeadingTrackingView.alpha < 1.0)
-            [UIView animateWithDuration:0.5 animations:^(void) { _userHeadingTrackingView.alpha = 1.0; }];
+            [UIView animateWithDuration:0.5 animations:^(void) {
+                _userHeadingTrackingView.alpha = 1.0;
+            }];
 
-        [CATransaction begin];
-        [CATransaction setAnimationDuration:0.5];
-        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-
-        [UIView animateWithDuration:0.5
-                              delay:0.0
-                            options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationCurveEaseInOut
-                         animations:^(void)
-                         {
-                             CGFloat angle = (M_PI / -180) * newHeading.trueHeading;
-
-                             _mapTransform = CGAffineTransformMakeRotation(angle);
-                             _annotationTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeRotation(-angle));
-
-                             _mapScrollView.transform = _mapTransform;
-                             _overlayView.transform   = _mapTransform;
-
-                             for (RMAnnotation *annotation in _annotations)
-                                 if ([annotation.layer isKindOfClass:[RMMarker class]] && ! annotation.isUserLocationAnnotation)
-                                     annotation.layer.transform = _annotationTransform;
-
-                             [self correctPositionOfAllAnnotations];
-                         }
-                         completion:nil];
-
-        [CATransaction commit];
+        [self rotateMapWithHeading:newHeading.trueHeading animated:YES];
     }
+}
+
+- (void)rotateMapWithHeading:(CLLocationDegrees)heading animated:(BOOL)animated
+{
+    NSTimeInterval duration = animated ? 0.5 : 0.0;
+    [UIView animateWithDuration:duration
+                          delay:0.0
+                        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationCurveEaseInOut
+                     animations:^(void)
+     {
+         CGFloat angle = (M_PI / -180.0f) * heading;
+         
+         _mapTransform = CGAffineTransformMakeRotation(angle);
+         _annotationTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeRotation(-angle));
+         
+         _mapScrollView.transform = _mapTransform;
+         _overlayView.transform   = _mapTransform;
+         
+         for (RMAnnotation *annotation in _annotations)
+             if ([annotation.layer isKindOfClass:[RMMarker class]] && ! annotation.isUserLocationAnnotation)
+                 annotation.layer.transform = _annotationTransform;
+         
+         [self correctPositionOfAllAnnotations];
+     } completion:nil];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status

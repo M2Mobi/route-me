@@ -38,7 +38,7 @@
 
 + (UIFont *)defaultFont
 {
-    return [UIFont systemFontOfSize:15];
+    return [UIFont systemFontOfSize:15.0f];
 }
 
 // init
@@ -146,7 +146,7 @@
 
 - (void)changeLabelUsingText:(NSString *)text font:(UIFont *)font foregroundColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor
 {
-    CGPoint position = CGPointMake([self bounds].size.width / 2 - [text sizeWithFont:font].width / 2, 4);
+    CGPoint position = CGPointMake(0.0f , CGRectGetHeight(self.bounds)/2.0f);
     [self setTextForegroundColor:textColor];
     [self setTextBackgroundColor:backgroundColor];
     [self changeLabelUsingText:text  position:position font:font foregroundColor:textColor backgroundColor:backgroundColor];
@@ -154,22 +154,32 @@
 
 - (void)changeLabelUsingText:(NSString *)text position:(CGPoint)position font:(UIFont *)font foregroundColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor
 {
-    CGSize textSize = [text sizeWithFont:font];
-    CGRect frame = CGRectMake(position.x, position.y, textSize.width+4, textSize.height+4);
+    CGSize textSize = [text sizeWithFont:font forWidth:300.0f lineBreakMode:NSLineBreakByTruncatingTail];
+    CGFloat textPadding = 14.0f;
+    CGRect labelFrame = CGRectMake(textPadding, textPadding, textSize.width, textSize.height);
+    CGRect boxFrame = CGRectMake(0.0f, 0.0f, textSize.width+(textPadding*2.0f), textSize.height+(textPadding*2.0f));
 
-    UILabel *aLabel = [[UILabel alloc] initWithFrame:frame];
+    UILabel *aLabel = [[UILabel alloc] initWithFrame:labelFrame];
     [self setTextForegroundColor:textColor];
     [self setTextBackgroundColor:backgroundColor];
-    [aLabel setNumberOfLines:0];
-    [aLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [aLabel setBackgroundColor:backgroundColor];
+    [aLabel setNumberOfLines:1];
+    [aLabel setBackgroundColor:[UIColor clearColor]];
     [aLabel setTextColor:textColor];
     [aLabel setFont:font];
     [aLabel setTextAlignment:UITextAlignmentCenter];
     [aLabel setText:text];
-
-    [self setLabel:aLabel];
+    
+    UIView *boxView = [[UIView alloc] initWithFrame:boxFrame];
+    boxView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds)+(textPadding*(1.0f/5.0f)));
+    boxView.backgroundColor = backgroundColor;
+    
+    [boxView addSubview:aLabel];
+    CALayer *boxLayer = [boxView layer];
+    boxLayer.cornerRadius = 5.0f;
+    
+    [self setLabel:boxView];
     [aLabel release];
+    [boxView release];
 }
 
 - (void)toggleLabel
