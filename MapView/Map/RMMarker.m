@@ -157,7 +157,7 @@
     CGSize textSize = [text sizeWithFont:font forWidth:300.0f lineBreakMode:NSLineBreakByTruncatingTail];
     CGFloat textPadding = 14.0f;
     CGRect labelFrame = CGRectMake(textPadding, textPadding, textSize.width, textSize.height);
-    CGRect boxFrame = CGRectMake(position.x, position.y, textSize.width+(textPadding*2.0f), textSize.height+(textPadding*2.0f));
+    CGRect boxFrame = CGRectMake(0.0f, 0.0f, textSize.width+(textPadding*2.0f), textSize.height+(textPadding*2.0f));
 
     UILabel *aLabel = [[UILabel alloc] initWithFrame:labelFrame];
     [self setTextForegroundColor:textColor];
@@ -170,7 +170,7 @@
     [aLabel setText:text];
     
     UIView *boxView = [[UIView alloc] initWithFrame:boxFrame];
-    boxView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds)+(textPadding*(1.0f/5.0f)));
+    boxView.center = position;
     boxView.backgroundColor = backgroundColor;
     
     [boxView addSubview:aLabel];
