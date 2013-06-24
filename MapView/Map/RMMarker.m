@@ -197,6 +197,7 @@
 {
     if ([self.label isHidden])
     {
+				self.zPosition = MAXFLOAT;
         // Using addSublayer will animate showing the label, whereas setHidden is not animated
         [self addSublayer:[self.label layer]];
         [self.label setHidden:NO];
@@ -207,6 +208,8 @@
 {
     if (![self.label isHidden])
     {
+				self.zPosition = 1.0f;
+
         // Using removeFromSuperlayer will animate hiding the label, whereas setHidden is not animated
         [[self.label layer] removeFromSuperlayer];
         [self.label setHidden:YES];
