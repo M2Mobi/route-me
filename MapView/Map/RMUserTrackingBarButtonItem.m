@@ -42,7 +42,7 @@ typedef enum {
 
 - (id)initWithMapView:(RMMapView *)mapView
 {
-    if ( ! (self = [super initWithCustomView:[[UIControl alloc] initWithFrame:CGRectMake(0, 0, 32, 32)]]))
+    if ( ! (self = [super initWithCustomView:[[[UIControl alloc] initWithFrame:CGRectMake(0, 0, 32, 32)] autorelease]]))
         return nil;
 
     [self createBarButtonItem];
@@ -56,7 +56,7 @@ typedef enum {
     if ( ! (self = [super initWithCoder:aDecoder]))
         return nil;
 
-    [self setCustomView:[[UIControl alloc] initWithFrame:CGRectMake(0, 0, 32, 32)]];
+    [self setCustomView:[[[UIControl alloc] initWithFrame:CGRectMake(0, 0, 32, 32)] autorelease]];
 
     [self createBarButtonItem];
 
