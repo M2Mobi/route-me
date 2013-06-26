@@ -2648,7 +2648,9 @@
         if (annotation.layer)
         {
             [_overlayView addSublayer:annotation.layer];
-            annotation.layer.transform = _annotationTransform;
+            if (![annotation.annotationType isEqualToString:@"M2MMapRouteAnnatationType"]) {
+                annotation.layer.transform = _annotationTransform;
+            }
             [_visibleAnnotations addObject:annotation];
         }
 
