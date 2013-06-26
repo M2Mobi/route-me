@@ -1106,6 +1106,8 @@
         ((CATiledLayer *)tiledLayerView.layer).tileSize = CGSizeMake(tileSideLength, tileSideLength);
 
         [_tiledLayersSuperview addSubview:tiledLayerView];
+
+        [tiledLayerView release];
     }
 
     [_mapScrollView addSubview:_tiledLayersSuperview];
@@ -1812,10 +1814,12 @@
 
         ((CATiledLayer *)tiledLayerView.layer).tileSize = CGSizeMake(tileSideLength, tileSideLength);
 
-        if (index >= [[_tileSourcesContainer tileSources] count])
+        if (index >= [[_tileSourcesContainer tileSources] count]){
             [_tiledLayersSuperview addSubview:tiledLayerView];
-        else
+        } else {
             [_tiledLayersSuperview insertSubview:tiledLayerView atIndex:index];
+        }
+        [tiledLayerView release];
     }
 
     [self setCenterProjectedPoint:centerPoint animated:NO];
@@ -1869,7 +1873,7 @@
     RMMapTiledLayerView *tileSourceTiledLayerView = [_tiledLayersSuperview.subviews objectAtIndex:index];
 
     tileSourceTiledLayerView.layer.contents = nil;
-    [tileSourceTiledLayerView removeFromSuperview]; [tileSourceTiledLayerView release]; tileSourceTiledLayerView = nil;
+    [tileSourceTiledLayerView removeFromSuperview];
 
     [self setCenterProjectedPoint:centerPoint animated:NO];
 }
@@ -3024,7 +3028,7 @@
         _accuracyCircleAnnotation.annotationType = kRMAccuracyCircleAnnotationTypeName;
         _accuracyCircleAnnotation.clusteringEnabled = NO;
         _accuracyCircleAnnotation.enabled = NO;
-        _accuracyCircleAnnotation.layer = [[RMCircle alloc] initWithView:self radiusInMeters:newLocation.horizontalAccuracy];
+        _accuracyCircleAnnotation.layer = [[[RMCircle alloc] initWithView:self radiusInMeters:newLocation.horizontalAccuracy] autorelease];
         _accuracyCircleAnnotation.layer.zPosition = -MAXFLOAT;
         _accuracyCircleAnnotation.isUserLocationAnnotation = YES;
 
@@ -3051,7 +3055,7 @@
 
         // create image marker
         //
-        _trackingHaloAnnotation.layer = [[RMMarker alloc] initWithUIImage:[UIImage imageNamed:@"TrackingDotHalo.png"]];
+        _trackingHaloAnnotation.layer = [[[RMMarker alloc] initWithUIImage:[UIImage imageNamed:@"TrackingDotHalo.png"]] autorelease];
         _trackingHaloAnnotation.layer.zPosition = -MAXFLOAT + 1;
         _trackingHaloAnnotation.isUserLocationAnnotation = YES;
 

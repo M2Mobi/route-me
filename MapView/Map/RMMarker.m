@@ -170,7 +170,7 @@
     [aLabel setText:text];
     
     UIView *boxView = [[UIView alloc] initWithFrame:boxFrame];
-    boxView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds)+(textPadding*(1.0f/5.0f)));
+    boxView.center = position;
     boxView.backgroundColor = backgroundColor;
     
     [boxView addSubview:aLabel];
@@ -197,6 +197,7 @@
 {
     if ([self.label isHidden])
     {
+				self.zPosition = MAXFLOAT;
         // Using addSublayer will animate showing the label, whereas setHidden is not animated
         [self addSublayer:[self.label layer]];
         [self.label setHidden:NO];
@@ -207,6 +208,8 @@
 {
     if (![self.label isHidden])
     {
+				self.zPosition = 1.0f;
+
         // Using removeFromSuperlayer will animate hiding the label, whereas setHidden is not animated
         [[self.label layer] removeFromSuperlayer];
         [self.label setHidden:YES];
