@@ -2574,48 +2574,61 @@
 {
     if ( ! _orderMarkersByYPosition)
         return;
-
+    
     // sort annotation layer z-indexes so that they overlap properly
     //
     NSMutableArray *sortedAnnotations = [NSMutableArray arrayWithArray:[_visibleAnnotations allObjects]];
-
+    
     [sortedAnnotations filterUsingPredicate:[NSPredicate predicateWithFormat:@"isUserLocationAnnotation = NO"]];
-
+    
     [sortedAnnotations sortUsingComparator:^(id obj1, id obj2)
      {
          RMAnnotation *annotation1 = (RMAnnotation *)obj1;
          RMAnnotation *annotation2 = (RMAnnotation *)obj2;
-
+         
          // clusters above/below non-clusters (based on _orderClusterMarkersAboveOthers)
          //
          if (   [annotation1.annotationType isEqualToString:kRMClusterAnnotationTypeName] && ! [annotation2.annotationType isEqualToString:kRMClusterAnnotationTypeName])
              return (_orderClusterMarkersAboveOthers ? NSOrderedDescending : NSOrderedAscending);
-
+         
          if ( ! [annotation1.annotationType isEqualToString:kRMClusterAnnotationTypeName] &&   [annotation2.annotationType isEqualToString:kRMClusterAnnotationTypeName])
              return (_orderClusterMarkersAboveOthers ? NSOrderedAscending : NSOrderedDescending);
-
+         
          // markers above shapes
          //
          if ([annotation1.layer isKindOfClass:[RMMarker class]] && [annotation2.layer isKindOfClass:[RMShape class]])
              return NSOrderedDescending;
-
+         
          if ([annotation1.layer isKindOfClass:[RMShape class]] && [annotation2.layer isKindOfClass:[RMMarker class]])
              return NSOrderedAscending;
-
+         
+         // selected markers above non-selected markers
+         if ([annotation1.layer isKindOfClass:[RMMarker class]] && [annotation2.layer isKindOfClass:[RMMarker class]]) {
+             RMMarker *marker1 = (RMMarker *)annotation1.layer;
+             RMMarker *marker2 = (RMMarker *)annotation2.layer;
+             if (!marker1.label.isHidden && marker2.label.isHidden) {
+                 return NSOrderedDescending;
+             }
+             if (marker1.label.isHidden && !marker2.label.isHidden) {
+                 return NSOrderedAscending;
+             }
+         }
+         
+         
          // the rest in increasing y-position
          //
          CGPoint obj1Point = [self convertPoint:annotation1.position fromView:_overlayView];
          CGPoint obj2Point = [self convertPoint:annotation2.position fromView:_overlayView];
-
+         
          if (obj1Point.y > obj2Point.y)
              return NSOrderedDescending;
-
+         
          if (obj1Point.y < obj2Point.y)
              return NSOrderedAscending;
-
+         
          return NSOrderedSame;
      }];
-
+    
     for (CGFloat i = 0; i < [sortedAnnotations count]; i++)
         ((RMAnnotation *)[sortedAnnotations objectAtIndex:i]).layer.zPosition = (CGFloat)i;
 }
